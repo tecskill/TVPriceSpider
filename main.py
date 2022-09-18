@@ -12,20 +12,24 @@ import GlobalDefine as GDefine
 class HitesSpider(object):
     # 初始化
     # 定义初始页面url
+    # reference: http://c.biancheng.net/python_spider/
     def __init__(self, listBrandName):
         self.listSearchBrand = listBrandName
         self.url = 'https://www.hites.com/busqueda?q={}&start=0&sz=48'
 
-    def extract_Modle(self, paraStr):
+    def extract_Modle_Size(self, paraStr):
         # string like : 'Led TCL 55P725 / 55  / Ultra HD / 4K / Smart Tv'
         strFix = '/'
         b = paraStr.find(strFix)
         if(b > 0):
             c = paraStr[:b]
             listStr = c.split()
-            return listStr[-1]
+            modelStr = listStr[-1]
+            listStr = paraStr[b+len(strFix):].split()
+            sizeStr = ''.join([ch for ch in listStr[0] if ch.isdigit()])
+            return modelStr, sizeStr
         else:
-            return ''
+            return '', ''
 
     # 请求函数
     def get_html(self, url):
@@ -64,9 +68,10 @@ class HitesSpider(object):
             for r in r_list:
                 html = r[0]
                 desc = r[1]
-                price = str(round(float(r[2])/1000,3))
-                modle = self.extract_Modle(desc)
-                L = [brandName, modle, desc, price, html]
+                #price = str(round(float(r[2])/1000,3))
+                price = r[2]
+                modle, size = self.extract_Modle_Size(desc)
+                L = [brandName, size, modle, desc, price, html]
                 # 写入csv文件
                 writer.writerow(L)
                 print(brandName, modle, desc, price)
@@ -91,7 +96,7 @@ class HitesSpider(object):
 # 以脚本方式启动
 if __name__ == '__main__':
     # 捕捉异常错误
-    searchList = ['TCL+TV', 'LG+TV', 'SAMSUNG+TV', 'PHILIPS+TV','HISENSE+TV', 'MASTER-G+TV']
+    searchList = ['TCL+TV', 'LG+TV', 'SAMSUNG+TV', 'PHILIPS+TV','HISENSE+TV', 'MASTER-G+TV', 'XIAOMI+TV']
     try:
         spider = HitesSpider(searchList)
         spider.run()

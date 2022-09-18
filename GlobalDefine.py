@@ -1,1 +1,1 @@
-SaveTilleList = ['brand', 'modle', 'para', 'price', 'html',]
+SaveTilleList = ['brand', 'size', 'modle', 'para', 'price', 'html']
